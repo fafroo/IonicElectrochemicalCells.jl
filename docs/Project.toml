@@ -1,2 +1,9 @@
 [deps]
+CompositeStructs = "534720e6-2374-40c5-8712-bf9a2f1643c6"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+ExtendableGrids = "cfc395e8-590f-11e8-1f13-43a2532b2fa8"
+ModelParameters = "4744a3fa-6c31-4707-899e-a3298e4618ad"
+SamplerIO = "bca66995-4ecd-408b-bba5-fd5fcf25f571"
+VoronoiFVM = "82b139dc-5afc-11e9-35da-9b9bdfd336f3"
