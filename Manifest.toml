@@ -816,7 +816,7 @@ version = "0.7.0"
 deps = ["DataFrames", "Sobol", "Test"]
 git-tree-sha1 = "74e9c62ee0fdf959c39f1c6b30cb5a7b4744d2d7"
 repo-rev = "main"
-repo-url = "git@github.com:fafroo/SamplerIO.jl.git"
+repo-url = "https://github.com/fafroo/SamplerIO.jl.git"
 uuid = "bca66995-4ecd-408b-bba5-fd5fcf25f571"
 version = "0.1.0"
 
