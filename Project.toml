@@ -14,6 +14,7 @@ VoronoiFVM = "82b139dc-5afc-11e9-35da-9b9bdfd336f3"
 
 [compat]
 VoronoiFVM = "0.18"
+DataFrames = "1"
 julia = "1.8"
 
 [extras]
