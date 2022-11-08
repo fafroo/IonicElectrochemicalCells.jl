@@ -13,6 +13,7 @@ SamplerIO = "bca66995-4ecd-408b-bba5-fd5fcf25f571"
 VoronoiFVM = "82b139dc-5afc-11e9-35da-9b9bdfd336f3"
 
 [compat]
+VoronoiFVM = "0.18"
 DataFrames = "1"
 julia = "1.8"
 
