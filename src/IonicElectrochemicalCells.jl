@@ -5,6 +5,7 @@ using CompositeStructs
 using DataFrames            # TODO bump to examples
 using DocStringExtensions   
 using ExtendableGrids
+using Markdown
 using ModelParameters
 using SamplerIO
 using VoronoiFVM            # https://github.com/j-fu/VoronoiFVM.jl

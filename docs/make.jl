@@ -1,11 +1,16 @@
 push!(LOAD_PATH,"../src/")
-using Documenter
+using Documenter, Literate
 using IonicElectrochemicalCells
+
 
 makedocs(
     sitename = "IonicElectrochemicalCells",
     format = Documenter.HTML(),
-    modules = [IonicElectrochemicalCells]
+    modules = [IonicElectrochemicalCells],
+    pages = Any[
+        "Physics"=>"lattice_gas.md",
+        "Types, Constructors and Methods"=>"allindex.md",
+    ]
 )
 
 # Documenter can also automatically deploy documentation to gh-pages.
