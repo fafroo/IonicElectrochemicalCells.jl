@@ -503,7 +503,13 @@ ayaLGphys1i = function (; AueDensity=BoltzmannAue)
                 # FIXME implicitly assuming the Boltzmann statistics for the ISR electrons
                 nes = nLAus / nLAu * exp(-data.Ge / kB / data.T) * AueDensity(data, V) # [# electrons/ ISR area]
                 # TODO ISRthickness = (bnode.region  == Γ_YSZl ? data.dL : data.dR)
-                f[ipsi] = ISR_chargedensity(nes, nVmaxs(data.alpha) * u[iyVs], AreaRatio) # the surface Poisson is consistent with [BSE2018]
+                ###
+                # The surface Poisson equation is consistent with [BSE2018]
+                # (-ε_+ ∇ψ_+)⋅ν_+ (-ε_- ∇ψ_-)⋅ν_- + ISR_chargedensity = 0
+                # However, the equation for normal fluxes and the breaction for an internal node between two REVs is implemented as
+                # - (j_+ ̇ν_+ + j_- ̇ν_-) + breaction = 0 
+                # thus ISR_chargedensity below, correctly, enters with a negative sign !!!
+                f[ipsi] = -ISR_chargedensity(nes, nVmaxs(data.alpha) * u[iyVs], AreaRatio)
                 #
             end
         end,
