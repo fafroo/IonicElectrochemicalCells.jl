@@ -436,19 +436,19 @@ function AYALG1iBoltzmann(grid=cell1D(electrode_thickness, electrolyte_thickness
 end
 
 
-const nLYSZs = nLYSZ^(2 / 3)  # [# faces/m^2]
-const nLAus = nLAu^(2 / 3)    # [# faces/m^2]
-const mCs = 2               # [# sites/face]
-const mAs = 4               # [# sites/face]
-const zLYSZs = mCs * zC - 2 * mAs# [elementary charge/face]
+const nLYSZs = nLYSZ^(2 / 3)  # [# YSZ faces/m^2]
+const nLAus = nLAu^(2 / 3)    # [# Au faces/m^2]
+const mCs = 2               # [# cation sites/YSZ face]
+const mAs = 4               # [# anion sites/YSZ face]
+const zLYSZs = mCs * zC - 2 * mAs # [static elementary charge/YSZ face] <=> fully occupied oxide vacancies
 const ISR_staticcharge = nLYSZs * zLYSZs + 1 * nLAus                          # per ISR area [C/m^2]
 # ISR_chargedensity(nes, nVs, areaRatio::Float64) = e0 * areaRatio * (nes * (-1.0) + nVs * zV + ISR_staticcharge) # per cell cross-section [C/m^2]
 ISR_chargedensity(nes, nVs, areaRatio::Float64) = e0 * (-nes + nVs * zV +  areaRatio * ISR_staticcharge) # per cell cross-section [C/m^2]
 
-yVmaxs(a::Float64)::Float64 = (-zLYSZs / zV * (1 - a) + mAs * a)
+yVmaxs(a::Float64)::Float64 = (-zLYSZs / zV * (1 - a) + mAs * a) # = nVmaxs / S_l nLYSZs = (mAs - (1-a)*mCs*zC/zV) # checked
 yVmaxs(sys::VoronoiFVM.AbstractSystem)::Float64 = yVmaxs(sys.physics.data.alpha)
-nVmaxs(a::Float64)::Float64 = nLYSZs * yVmaxs(a)                                       # per ISR area
-nVmaxs(sys::VoronoiFVM.AbstractSystem)::Float64 = nVmaxs(sys.physics.data.alpha)     # per ISR area
+nVmaxs(a::Float64, S::Float64)::Float64 = nLYSZs * S * yVmaxs(a)                                       # per ISR area
+#nVmaxs(sys::VoronoiFVM.AbstractSystem)::Float64 = nVmaxs(sys.physics.data.alpha)     # per ISR area
 
 @kwdef struct ISRparameters{A,B,C,D,E,F,G,H,I}
     alphas::A = Param(0.05, bounds=(0.0,1.0)) # [1] ratio of admissible vacancies at ISR
@@ -499,7 +499,7 @@ ayaLGphys1i = function (; AueDensity=BoltzmannAue)
                 AreaRatio = (bnode.region == Γ_YSZl ? data.SL : data.SR)
                 # implementation for bspecies 
                 # bstorage + breaction = 0
-                f[iyVs] = -data.kA * ReducedRateA / (AreaRatio * nVmaxs(data.alpha))
+                f[iyVs] = -data.kA * ReducedRateA / nVmaxs(data.alpha, AreaRatio)
                 # implementation for species
                 # - j ̇ν + breaction = 0
                 f[iyV] = data.kA * ReducedRateA / nVmax(data.alpha)
@@ -516,7 +516,7 @@ ayaLGphys1i = function (; AueDensity=BoltzmannAue)
                 # However, the equation for normal fluxes and the breaction for an internal node between two REVs is implemented as
                 # - (j_+ ̇ν_+ + j_- ̇ν_-) + breaction = 0 
                 # thus ISR_chargedensity below, correctly, enters with a negative sign !!!
-                f[ipsi] = -ISR_chargedensity(nes, nVmaxs(data.alpha) * u[iyVs], AreaRatio)
+                f[ipsi] = -ISR_chargedensity(nes, nVmaxs(data.alpha, AreaRatio ) * u[iyVs], AreaRatio)
                 #
             end
         end,
@@ -547,7 +547,7 @@ end
 function ayaLG1iinival(system)
     inival = VoronoiFVM.unknowns(system, inival=nVmax(0.0) / nVmax(system))
     inival[ipsi, :] .= 0.0
-    inival[iyVs, :] .= nVmaxs(0.0) / nVmaxs(system) # TODO adjust for each boundary
+    inival[iyVs, :] .= yVmaxs(0.0) / yVmaxs(system) # TODO adjust for each boundary
     return inival
 end
 
