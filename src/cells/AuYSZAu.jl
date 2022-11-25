@@ -442,7 +442,8 @@ const mCs = 2               # [# sites/face]
 const mAs = 4               # [# sites/face]
 const zLYSZs = mCs * zC - 2 * mAs# [elementary charge/face]
 const ISR_staticcharge = nLYSZs * zLYSZs + 1 * nLAus                          # per ISR area [C/m^2]
-ISR_chargedensity(nes, nVs, areaRatio::Float64) = e0 * areaRatio * (nes * (-1.0) + nVs * zV + ISR_staticcharge) # per cell cross-section [C/m^2]
+# ISR_chargedensity(nes, nVs, areaRatio::Float64) = e0 * areaRatio * (nes * (-1.0) + nVs * zV + ISR_staticcharge) # per cell cross-section [C/m^2]
+ISR_chargedensity(nes, nVs, areaRatio::Float64) = e0 * (-nes + nVs * zV +  areaRatio * ISR_staticcharge) # per cell cross-section [C/m^2]
 
 yVmaxs(a::Float64)::Float64 = (-zLYSZs / zV * (1 - a) + mAs * a)
 yVmaxs(sys::VoronoiFVM.AbstractSystem)::Float64 = yVmaxs(sys.physics.data.alpha)
@@ -485,9 +486,10 @@ ayaLGphys1i = function (; AueDensity=BoltzmannAue)
         storage=ayaLGp.storage,
         breaction=function (f, u, bnode, data)
             if bnode.region in ISR
-                # adsorption of vacancies 
+                # !! notation: ν is an outer normal vector
+                # Adsorption of vacancies 
                 # TODO add the difference of the electrostatic potential or its derivative*thickness of the ISR to the "equilibrium constant for vacancies"
-                KVsq = exp(-data.GA / data.T / kB / 2 + (data.AYSZ * u[iyV] - data.As * u[iyVs]) / 2) # sqrt(K)
+                KVsq = exp(-data.GA / data.T / kB / 2 + (data.AYSZ * u[iyV] - data.As * u[iyVs]) / 2) # sqrt(KV)
                 ReducedRateA = KVsq * u[iyV] * (1.0 - u[iyVs]) - 1 / KVsq * u[iyVs] * (1.0 - u[iyV])
                 # INFO the reaction rate is calculated in [# vacancies/cross section area]
                 # and its contribution to both coverages isn't thus far scaled appropriately
@@ -495,7 +497,11 @@ ayaLGphys1i = function (; AueDensity=BoltzmannAue)
                 # the fix should look something like
                 # ... a check is needed though
                 AreaRatio = (bnode.region == Γ_YSZl ? data.SL : data.SR)
+                # implementation for bspecies 
+                # bstorage + breaction = 0
                 f[iyVs] = -data.kA * ReducedRateA / (AreaRatio * nVmaxs(data.alpha))
+                # implementation for species
+                # - j ̇ν + breaction = 0
                 f[iyV] = data.kA * ReducedRateA / nVmax(data.alpha)
                 # equilibrium of electrons
                 # V = u[ipsi] - (bnode.region ==  Γ_YSZl ? data.bias : 0.0) !!! inconsistent with the bulk eqns
@@ -541,7 +547,7 @@ end
 function ayaLG1iinival(system)
     inival = VoronoiFVM.unknowns(system, inival=nVmax(0.0) / nVmax(system))
     inival[ipsi, :] .= 0.0
-    inival[iyVs, :] .= nVmaxs(0.0) / nVmaxs(system)
+    inival[iyVs, :] .= nVmaxs(0.0) / nVmaxs(system) # TODO adjust for each boundary
     return inival
 end
 
@@ -603,6 +609,7 @@ function AuL_charge(cell::AYALG1iBoltzmann)
     else
         QrAuLb = VoronoiFVM.integrate(cell.system, cell.system.physics.reaction, cell.U, boundary=true) # nspec x nregion
         ISRcontribution = QrAuLb[ipsi, bnd]
+        # TODO try to integrate breaction instead of reaction !!
         # FIXME the result of the boundary integration is really large for Γ_YSZl, but 0.0 for Γ_YSZr. This needs to be resolved.
         # @show QrAuLb[ipsi, Γ_YSZl:Γ_YSZr] 
     end
