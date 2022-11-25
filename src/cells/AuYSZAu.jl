@@ -34,6 +34,7 @@ const mA = 8.0
 const epsYSZ = 28.0 * ε0
 const zV = 2.0
 const zi = -zV
+""" lattice charge density in YSZ """
 zCf(x) = 4.0 * (1.0 - x) / (1.0 + x) + 2.0 * 3.0 * x / (1.0 + x)
 const Nv = (1.0 - nu) * mA * nLYSZ # upper bound of vacancy concentration 
 const zC = zCf(x_frac)
@@ -43,6 +44,14 @@ YSZ_charge_density(nV, x) = e0 * nLYSZ * (mC * zCf(x) + mA * zi) + e0 * zV * nV 
 YSZ_charge_density(nV) = YSZ_charge_density(nV, x_frac)#e0*nLYSZ*(mC*zC + mA*zi + zV*nV/nLYSZ)
 electroneutral_nV_YSZ(x) = -(mC * zCf(x) + mA * zi) * nLYSZ / zV
 const electroneutral_nV = electroneutral_nV_YSZ(x_frac)
+X(dpsi, sys) = (electroneutral_nV / (nVmax(sys) - electroneutral_nV)) * exp(zV * e0 / kB / sys.physics.data.T * dpsi)
+yVeq(x) = x ./ (1 .+ x)
+nVeq(dpsi, sys) = nVmax(sys) * yVeq(X(dpsi, sys))
+
+yVmax(a::Float64) = (-zL / zV * (1 - a) + mA * a)
+yVmax(sys::VoronoiFVM.AbstractSystem) = yVmax(sys.physics.data.alpha)
+nVmax(a::Float64) = nLYSZ * yVmax(a)
+nVmax(sys::VoronoiFVM.AbstractSystem) = nVmax(sys.physics.data.alpha)
 
 @composite mutable struct YHElectrolyte <: AbstractCell
     CommonCell...
@@ -238,14 +247,6 @@ control.store_all = false
 #     bias::Float64 = 0.0
 # end
 
-X(dpsi, sys) = (electroneutral_nV / (nVmax(sys) - electroneutral_nV)) * exp(zV * e0 / kB / sys.physics.data.T * dpsi)
-yVeq(x) = x ./ (1 .+ x)
-nVeq(dpsi, sys) = nVmax(sys) * yVeq(X(dpsi, sys))
-
-yVmax(a::Float64) = (-zL / zV * (1 - a) + mA * a)
-yVmax(sys::VoronoiFVM.AbstractSystem) = yVmax(sys.physics.data.alpha)
-nVmax(a::Float64) = nLYSZ * yVmax(a)
-nVmax(sys::VoronoiFVM.AbstractSystem) = nVmax(sys.physics.data.alpha)
 
 #=
 
