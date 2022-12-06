@@ -553,7 +553,7 @@ version = "1.2.0"
 
 [[deps.IonicElectrochemicalCells]]
 deps = ["CompositeStructs", "DataFrames", "DocStringExtensions", "ExtendableGrids", "Markdown", "ModelParameters", "VoronoiFVM"]
-git-tree-sha1 = "8c0cffbcfe955166d1b65e59f16df200d279e9c0"
+git-tree-sha1 = "bedbb82b13620b1d831a2590d0aadd5dcbef23e5"
 repo-rev = "AuYSZrefactorization"
 repo-url = ".."
 uuid = "9b3a78ad-cd55-49eb-a790-9ac44eee3717"
