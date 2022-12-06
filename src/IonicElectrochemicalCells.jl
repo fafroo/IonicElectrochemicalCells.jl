@@ -7,7 +7,6 @@ using DocStringExtensions
 using ExtendableGrids
 using Markdown
 using ModelParameters
-using SamplerIO
 using VoronoiFVM            # https://github.com/j-fu/VoronoiFVM.jl
 
 include("auxiliary.jl");            export set_parameters!, ishless, row2dict
