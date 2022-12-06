@@ -605,9 +605,9 @@ function AuL_charge(cell::AYALG1iBoltzmann)
         AreaRatio = (bnd == Γ_YSZl ? data.SL : data.SR)
         V = (bnd == Γ_YSZl ? data.bias : 0.0) - cell.U[ipsi, bnd_index]
         nes = nLAus / nLAu * exp(-data.Ge / kB / data.T) * BoltzmannAue(data, V) # [# electrons/ ISR area]
-        ISRcontribution = ISR_chargedensity(nes, nVmaxs(data.alpha) * cell.U[iyVs, bnd_index], AreaRatio)
+        ISRcontribution = -ISR_chargedensity(nes, nVmaxs(data.alpha, AreaRatio) * cell.U[iyVs, bnd_index], AreaRatio)
     else
-        QrAuLb = VoronoiFVM.integrate(cell.system, cell.system.physics.reaction, cell.U, boundary=true) # nspec x nregion
+        QrAuLb = VoronoiFVM.integrate(cell.system, cell.system.physics.breaction, cell.U, boundary=true) # nspec x nregion
         ISRcontribution = QrAuLb[ipsi, bnd]
         # TODO try to integrate breaction instead of reaction !!
         # FIXME the result of the boundary integration is really large for Γ_YSZl, but 0.0 for Γ_YSZr. This needs to be resolved.
