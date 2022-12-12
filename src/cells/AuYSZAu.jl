@@ -475,6 +475,11 @@ parameters2VoronoiData(Model((SharedParams(), YSZparams(), Auparams(), ISRparame
 #     SR::Float64 = 1.0 # [1] (ISR area)/(cross section area) -- right
 # end
 
+ISR_arearatio(bnode,data) = (bnode.region == Γ_YSZl ? data.SL : data.SR)
+reduced_voltage(u, bnode, data) = (bnode.region == Γ_YSZl ? data.bias : 0.0) - u[ipsi]
+ISR_electrondensity(u, bnode, data) = nLAus / nLAu * exp(-data.Ge / kB / data.T) * BoltzmannAue(data, reduced_voltage(u,bnode,data)) # [# electrons/ ISR area]
+ISR_chargedensity(u, bnode, data) = ISR_chargedensity(ISR_electrondensity(u, bnode, data), u[iyVs], ISR_arearatio(bnode,data))  # per cell cross-section [C/m^2]
+
 ayaLGphys1i = function (; AueDensity=BoltzmannAue)
     ayaLGp = ayaLGphys(AueDensity=AueDensity)
     return VoronoiFVM.Physics(
@@ -496,7 +501,8 @@ ayaLGphys1i = function (; AueDensity=BoltzmannAue)
                 # However, this is no problem for a blocking electrode in equilibrium...
                 # the fix should look something like
                 # ... a check is needed though
-                AreaRatio = (bnode.region == Γ_YSZl ? data.SL : data.SR)
+                # AreaRatio = (bnode.region == Γ_YSZl ? data.SL : data.SR)
+                AreaRatio = ISR_arearatio(bnode, data)
                 # implementation for bspecies 
                 # bstorage + breaction = 0
                 f[iyVs] = -data.kA * ReducedRateA / nVmaxs(data.alpha, AreaRatio)
@@ -504,11 +510,12 @@ ayaLGphys1i = function (; AueDensity=BoltzmannAue)
                 # - j ̇ν + breaction = 0
                 f[iyV] = data.kA * ReducedRateA / nVmax(data.alpha)
                 # equilibrium of electrons
-                # V = u[ipsi] - (bnode.region ==  Γ_YSZl ? data.bias : 0.0) !!! inconsistent with the bulk eqns
-                V = (bnode.region == Γ_YSZl ? data.bias : 0.0) - u[ipsi]
+                # V = (bnode.region == Γ_YSZl ? data.bias : 0.0) - u[ipsi]
+                V = reduced_voltage(u, bnode, data) 
                 # TODO add the difference of the electrostatic potential or its derivative*thickness of the ISR to the "equilibrium constant for electrons"
                 # FIXME implicitly assuming the Boltzmann statistics for the ISR electrons
-                nes = nLAus / nLAu * exp(-data.Ge / kB / data.T) * AueDensity(data, V) # [# electrons/ ISR area]
+                # nes = nLAus / nLAu * exp(-data.Ge / kB / data.T) * AueDensity(data, V) # [# electrons/ ISR area]
+                nes = ISR_electrondensity(u, bnode, data) # [# electrons/ ISR area]
                 # TODO ISRthickness = (bnode.region  == Γ_YSZl ? data.dL : data.dR)
                 ###
                 # The surface Poisson equation is consistent with [BSE2018]

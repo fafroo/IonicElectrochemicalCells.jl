@@ -266,7 +266,7 @@ plot(Bdf.bias, Bdf.capacitance .- BNdf.capacitance)
 # ╔═╡ 0b2d3b1c-663b-4ecb-ac7e-81c26faeff80
 begin
 	capcell = AYALG1iBoltzmann()
-	update_parameters!(capcell, Dict(:GA => 0.0*e0, :SL => 1e3, :AYSZ => 0.0, :As => 0.0, :Ge => 0.1*e0))
+	update_parameters!(capcell, Dict(:GA => 0.0*e0, :SL => 1e0, :AYSZ => 0.0, :As => 0.0, :Ge => 0.1*e0))
 	capdf = biascapacitance!(capcell)
 end;
 

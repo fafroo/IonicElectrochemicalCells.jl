@@ -21,5 +21,5 @@ using Test
     end
     cell = AYALG1iBoltzmann() # TODO use smaller grid > faster test BUT convergence...
     biastest!(cell)
-    @test isapprox(AuL_charge(cell),-0.5666849973539834)  # check the value in the DL 
+    @test isapprox(AuL_charge(cell),-0.37091832870777824)  # check the value in the DL 
 end
