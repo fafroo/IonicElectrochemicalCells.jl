@@ -110,18 +110,21 @@ md"""
 # ╔═╡ 2b75684e-3182-42a6-bb12-7b8cada8f4d9
 BLG1icell = AYALG1iBoltzmann()
 
+# ╔═╡ c58123ca-4637-4188-8509-d209f428fa54
+BLG1icellpars=Dict(
+		:T => 800.0,
+		:alpha => 1e-1,	
+		:alphas => 1e-1,
+		:AYSZ => 0.38,
+		:As => 0.49,
+		:GA => -1.0*e0,
+		:Ge => 0.0*e0,
+		:SL => 1.0e0
+)
+
 # ╔═╡ 3ddeccf0-9382-442c-a987-c50447c96a9c
 begin
-	update_parameters!(BLG1icell, Dict(
-		:T => 800.0,
-		:alphas => 0.05,
-		:Ge => -9.6e-21,
-		:AYSZ => 0.38,
-		:alpha => 1e-1,
-		:As => 0.49,
-		:GA => -4.2e-21,
-		:Ge => -1.5e-21,
-		:SL => 0.4))
+	update_parameters!(BLG1icell, BLG1icellpars)
 	BLG1icell.U = inival(BLG1icell)
 	df = biasshow!(BLG1icell, tend=1.0e2)
 	# cellinival = inival(BLG1icell);
@@ -164,10 +167,10 @@ safe envelope
 ```
 alpha, alphas
 -1.0 eV < :GA < 1.0 eV
--0.15 eV < :Ge < 0.15 eV
+-0.05 eV < :Ge < 0.2 eV
 -1.0 eV < :AYSZ < 1.0 eV
--1.0 eV < :As < 1.0 eV
-1e-3 < :SL, :SR < 1e3
+-1.0 eV < :As < 0.2 eV
+1e-2 < :SL, :SR < 1e1
 ```
 **Further investigation**
 
@@ -266,12 +269,17 @@ plot(Bdf.bias, Bdf.capacitance .- BNdf.capacitance)
 # ╔═╡ 0b2d3b1c-663b-4ecb-ac7e-81c26faeff80
 begin
 	capcell = AYALG1iBoltzmann()
-	update_parameters!(capcell, Dict(:GA => 0.0*e0, :SL => 1e0, :AYSZ => 0.0, :As => 0.0, :Ge => 0.1*e0))
+	refcapdf = biascapacitance!(capcell)
+	#update_parameters!(capcell, Dict(:GA => 0.0*e0, :SL => 1e0, :AYSZ => 0.0, :As => 0.0, :Ge => 0.1*e0))
+	update_parameters!(capcell, BLG1icellpars)
 	capdf = biascapacitance!(capcell)
 end;
 
 # ╔═╡ db3a45ba-970f-4a5b-922c-3b784aca061e
-plot(capdf.bias, capdf.capacitance)
+begin
+	cp = plot(capdf.bias, capdf.capacitance)
+	plot!(cp, refcapdf.bias, refcapdf.capacitance, linestyle=:dot)
+end
 
 # ╔═╡ e1a9a96b-aada-4f64-b1b9-37c042ea8806
 md"""
@@ -323,14 +331,15 @@ To-Do
 # ╟─44f8cf91-ca35-4081-a28e-79ee679c3f1b
 # ╟─13825791-9960-496c-ad4e-9cef09aeb7da
 # ╠═2b75684e-3182-42a6-bb12-7b8cada8f4d9
+# ╠═c58123ca-4637-4188-8509-d209f428fa54
 # ╠═3ddeccf0-9382-442c-a987-c50447c96a9c
 # ╠═7cb18a48-4012-4e52-88ec-a0ef10f1ecd2
 # ╟─67b8e041-48f9-465b-a4e8-516ea4b377aa
 # ╠═d389d5ec-923f-42c9-9903-f43d941b5a9b
 # ╟─6aae8169-96cf-411c-ac28-a8e9164e415d
 # ╟─3d601f9a-e718-441f-a676-7652bdd048bd
+# ╠═db3a45ba-970f-4a5b-922c-3b784aca061e
+# ╠═0b2d3b1c-663b-4ecb-ac7e-81c26faeff80
 # ╠═e929ca9d-b7d8-4868-b4bf-bbe44de041b4
 # ╠═d6d5bdfe-d730-445c-80bd-6c5a4d57cbb6
-# ╠═0b2d3b1c-663b-4ecb-ac7e-81c26faeff80
-# ╠═db3a45ba-970f-4a5b-922c-3b784aca061e
 # ╟─e1a9a96b-aada-4f64-b1b9-37c042ea8806
