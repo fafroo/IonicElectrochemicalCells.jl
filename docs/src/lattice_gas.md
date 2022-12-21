@@ -246,7 +246,9 @@ and again, we assume that
 (1-\underline{\alpha}) \underline{n}_\text{V}^\text{eq}(x^{\#}) 
 + \underline{\alpha} \underline{m}_\text{A} \underline{n}_\text{YSZ}^{\#}
 ```
+
 Hence the vacancy concentration now reads,
+
 ```math
 \begin{aligned}
 \text{ISR vacancy coverage}\quad \underline{n}_\text{V}(\underline{y}_\text{V}, \underline{\alpha}, x^{\#}, \underline{S}_l) 
@@ -258,16 +260,22 @@ Hence the vacancy concentration now reads,
   \Big)~. 
 \end{aligned}
 ```
+
 where ``\underline{y}_\text{V}`` is the *ISR vacancy coverage*.
+
 ### Normal transport (adsorption) of oxide vacancies
+
 The adsorption proceeds in positive direction from the YSZ bulk to the ISR,
+
 ```math
 \text{V}^{..}_\text{O}  + \text{O}_\text{O}(s) 
 \rightarrow 
 \text{V}^{..}_\text{O}(s)  + \text{O}_\text{O} 
 ~.
 ```
+
 This means, that rate 
+
 ```math
 \underline{R}_\text{V} 
 = 
@@ -289,21 +297,27 @@ This means, that rate
     }{2}
 \right)
 ```
+
 enters the LHS of the ISR balance with negative sign. 
+
 ```math
 \partial_t \underline{y}_\text{V}
 -
 \frac{1}{\underline{S}_l \underline{n}_\text{V}^\text{max}}\underline{R}_\text{V}
 =0
 ```
+
 Finally, the rate has to be equal to the outflux of bulk vacancies, which induces the following Robin boundary condition,
+
 ```math
 -\vec{\mathbf{j}}_\text{V}\cdot\nu_\text{YSZ} 
 + 
 \frac{1}{n_\text{V}^\text{max}}\underline{R}_\text{V} 
 = 0
 ```
+
 ### Drift-diffusion equilibrium of ISR electrons
+
 ```math
 \underline{n}_\text{e} 
 =
@@ -314,9 +328,54 @@ Finally, the rate has to be equal to the outflux of bulk vacancies, which induce
 \exp{\frac{z_\text{e} e_0}{k_\text{B}T}(\psi_{l,r} - \psi(x))}
 ```
 
+### Differential capacitance
+
+```math
+\begin{align}
+I 
+=& \int_{\Gamma_{Au}^{L}} - e_0 \vec{j}_e \cdot \nu
+\\
+%
+&= \int_{\Omega_{Au}^{L}} \partial_t  e_0( n_{Au}- n_e )
+        -\int_{\Gamma_{YSZ}^{L}} - e_0 \partial_t \underline{n}_e 
+\\
+%
+&= \partial_t \left(
+    \int_{\Omega_{Au}^{L}} e_0( n_{Au}- n_e )
+    -\int_{\Gamma_{YSZ}^{L}} - e_0 \underline{n}_e 
+\right)
+\end{align}
+```
+
+Note that the first integral corresponds to the right-hand side of the Poisson equation in the electrode (with negative sign).
+The second term is the charge density due to the surface electrons.
+
+We assume that the time derivative of current can be replaced by the derivative with respect to the bias $V$.
+
+```math
+\begin{align}
+I = \frac{\mathrm{d} Q}{\mathrm{d} t} 
+= \frac{\mathrm{d} Q}{\mathrm{d} V}\frac{\mathrm{d} V}{\mathrm{d} t}
+= C \frac{\mathrm{d} V}{\mathrm{d} t}
+\end{align}
+```
+
+The differential capacity is defined as
+
+```math
+\begin{align}
+C &= \frac{\mathrm{d} }{\mathrm{d} V}\left(
+    \int_{\Omega_{Au}^{L}} e_0( n_{Au}- n_e )
+    -\int_{\Gamma_{YSZ}^{L}} - e_0 \underline{n}_e 
+\right)
+\end{align}
+```
+
 ## Sedan scheme 
+
 We discretize the drift-diffusion fluxes using the Sedan scheme.
 Roughly, the main idea of the Sedan scheme splits the normal projection of the flux to the diffusion part and the rest:
+
 ```math
 \vec{j} {\cdot}  = - ( \nabla u\cdot  + uq), u(x_1) = u_1, u(x_2) = u_2
 ```
