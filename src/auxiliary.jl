@@ -16,7 +16,7 @@ end
 
 function set_parameters!(parameters, d::Dict)
     for key in keys(d)
-        key in fieldnames(typeof(parameters)) ? setfield!(parameters, Symbol(key), d[key]) : nothing
+        key in fieldnames(typeof(parameters)) ? setfield!(parameters, Symbol(key), d[key]) : @warn key "not found in parameters"
     end
 end
 
