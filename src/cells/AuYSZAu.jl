@@ -452,7 +452,7 @@ nVmaxs(a::Float64, S::Float64)::Float64 = nLYSZs * S * yVmaxs(a)                
 
 @kwdef struct ISRparameters{A,B,C,D,E,F,G,H,I}
     alphas::A = Param(0.05, bounds=(0.0,1.0)) # [1] ratio of admissible vacancies at ISR
-    As::B = Param(0.0, bounds=(0.0,1.0)) # [eV] interaction energy of vacancies at ISR
+    AYSZs::B = Param(0.0, bounds=(0.0,1.0)) # [eV] interaction energy of vacancies at ISR
     GA::C = Param(0.0 * e0, bounds=(0.0,1.0)) # [eV] Gibbs energy of vacancy adsorption
     Ge::D = Param(0.0 * e0, bounds=(0.0,1.0)) # [eV] Gibbs energy of electron adsorption
     kA::E = Param(1.0e15, bounds=(0.0,1.0)) # [1/m^2/s] rate of vacancy adsorption
@@ -465,7 +465,7 @@ parameters2VoronoiData(Model((SharedParams(), YSZparams(), Auparams(), ISRparame
 # @composite @kwdef mutable struct parameters1i
 #     parameters...
 #     alphas::Float64 = 0.05 # [1] ratio of admissible vacancies at ISR
-#     As::Float64 = 0.0 # [eV] interaction energy of vacancies at ISR
+#     AYSZs::Float64 = 0.0 # [eV] interaction energy of vacancies at ISR
 #     GA::Float64 = 0.0 * e0 # [eV] Gibbs energy of vacancy adsorption
 #     Ge::Float64 = 0.0 * e0 # [eV] Gibbs energy of electron adsorption
 #     kA::Float64 = 1.0e15 # [1/m^2/s] rate of vacancy adsorption
@@ -494,7 +494,7 @@ ayaLGphys1i = function (; AueDensity=BoltzmannAue)
                 # !! notation: ν is an outer normal vector
                 # Adsorption of vacancies 
                 # TODO add the difference of the electrostatic potential or its derivative*thickness of the ISR to the "equilibrium constant for vacancies"
-                KVsq = exp(-data.GA / data.T / kB / 2 + (data.AYSZ * u[iyV] - data.As * u[iyVs]) / 2) # sqrt(KV)
+                KVsq = exp(-data.GA / data.T / kB / 2 + (data.AYSZ * u[iyV] - data.AYSZs * u[iyVs]) / 2) # sqrt(KV)
                 ReducedRateA = KVsq * u[iyV] * (1.0 - u[iyVs]) - 1 / KVsq * u[iyVs] * (1.0 - u[iyV])
                 # INFO the reaction rate is calculated in [# vacancies/cross section area]
                 # and its contribution to both coverages isn't thus far scaled appropriately
